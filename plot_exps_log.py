@@ -25,7 +25,7 @@ def load_tensorboard_data(log_dir):
 
 
 def formatter(x, pos):
-    return f'{int(x/100)}'  # Assumes x is the index, every index is 100000 updates
+    return f'{int(x/10)}'  # Assumes x is the index, every index is 100000 updates
 
 
 def plot_data(game_data):
@@ -43,10 +43,10 @@ def plot_data(game_data):
         reward_max = np.max(rewards, axis=0)
         reward_min = np.min(rewards, axis=0)
 
-        q_means = np.mean(q_values, axis=0)
-        q_medians = np.median(q_values, axis=0)
-        q_max = np.max(q_values, axis=0)
-        q_min = np.min(q_values, axis=0)
+        q_means = np.mean(q_values, axis=0)[::10]
+        q_medians = np.median(q_values, axis=0)[::10]
+        q_max = np.max(q_values, axis=0)[::10]
+        q_min = np.min(q_values, axis=0)[::10]
 
         fig, axs = plt.subplots(2, 1, figsize=(15, 12), dpi=300)  # 使用更高的DPI确保图像质量
 
