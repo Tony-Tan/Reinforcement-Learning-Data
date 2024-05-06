@@ -25,7 +25,7 @@ def load_tensorboard_data(log_dir):
 
 
 def formatter(x, pos):
-    return f'{int(x/100)}M'  # Assumes x is the index, every index is 100000 updates
+    return f'{int(x/100)}'  # Assumes x is the index, every index is 100000 updates
 
 
 def plot_data(game_data):
