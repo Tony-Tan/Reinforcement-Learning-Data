@@ -25,11 +25,15 @@ def load_tensorboard_data(log_dir):
 
 
 def formatter(x, pos):
-    return f'{int(x/10)}'  # Assumes x is the index, every index is 100000 updates
+    return f'{int(x / 10)}'  # Assumes x is the index, every index is 100000 updates
 
 
 def plot_each_data(game_data):
-    plt.rcParams.update({'font.size': 14})  # 设置字体大小适合学术论文
+    plt.rcParams.update({
+        'font.size': 10,
+        'font.family': 'serif',
+        # 'text.usetex': True,
+    }) # 设置字体大小适合学术论文
     plt.style.use('seaborn-v0_8-whitegrid')  # 使用seaborn的白色网格风格
 
     for game_name, data in game_data.items():
@@ -76,6 +80,7 @@ def plot_each_data(game_data):
 
         plt.tight_layout()
         plt.savefig(f'./figures/dqn/{game_name}_stats.png', bbox_inches='tight')  # 保存为PNG格式，确保边界正确显示
+
 
 def plot_data3x3(game_data):
     # 更新matplotlib配置以适应学术论文的要求
@@ -152,7 +157,9 @@ def plot_data3x3(game_data):
         ax.grid(True, linestyle='--', linewidth=0.6, color='white', alpha=1)  # 添加透明的网格线
     plt.tight_layout()
     # plt.savefig('./figures/dqn/tpami_q_values.eps', format='eps', bbox_inches='tight')
-    plt.savefig('./figures/dqn_q_values.png',  bbox_inches='tight')
+    plt.savefig('./figures/dqn_q_values.png', bbox_inches='tight')
+
+
 # 主执行函数
 def main(log_dir):
     game_data = {}
@@ -166,13 +173,9 @@ def main(log_dir):
             if len(rewards) >= 200:
                 if game_name not in game_data:
                     game_data[game_name] = []
-                game_data[game_name].append((rewards[:200], q_values))
-            # elif 200 > len(rewards) > 180:
-            #     if game_name not in game_data:
-            #         game_data[game_name] = []
-            #     game_data[game_name].append((rewards[:180], q_values[:180]))
-    # plot_data3x3(game_data)
+                game_data[game_name].append((rewards[:200], q_values[:2000]))
     plot_each_data(game_data)
+
 
 # 示例调用
 main('./exps/dqn')
