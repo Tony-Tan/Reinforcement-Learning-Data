@@ -28,7 +28,7 @@ def formatter(x, pos):
     return f'{int(x / 10)}'  # Assumes x is the index, every index is 100000 updates
 
 
-def plot_each_data(game_data):
+def plot_each_data(game_data, exp_name):
     plt.rcParams.update({
         'font.size': 10,
         'font.family': 'serif',
@@ -60,7 +60,8 @@ def plot_each_data(game_data):
         ax1.plot(reward_medians, linestyle='dashed', label='Median Reward', color='darkorange')
         ax1.fill_between(range(len(reward_means)), reward_min, reward_max, color='lightgray', alpha=0.5)
         ax1.set_title(f'Reward for {game_name}')
-        ax1.set_xlabel('Steps (in 0.1 millions)')
+        ax1.xaxis.set_major_formatter(FuncFormatter(lambda x, pos: f'{int(x * 0.1)}'))
+        ax1.set_xlabel('Millions of updates')
         ax1.set_ylabel('Reward')
         ax1.legend(frameon=False)
         ax1.set_facecolor('#f0f0f0')
@@ -72,17 +73,20 @@ def plot_each_data(game_data):
         ax2.plot(q_medians, linestyle='dashed', label='Median Q', color='crimson')
         ax2.fill_between(range(len(q_means)), q_min, q_max, color='lightgray', alpha=0.5)
         ax2.set_title(f'Q Values for {game_name}')
-        ax2.set_xlabel('Updates (in 0.1 millions)')
+        ax2.xaxis.set_major_formatter(FuncFormatter(lambda x, pos: f'{int(x * 0.1)}'))
+        ax2.set_xlabel('Millions of updates')
         ax2.set_ylabel('Q value')
         ax2.legend(frameon=False)
         ax2.set_facecolor('#f0f0f0')
         ax2.grid(True, linestyle='--', linewidth=0.6, color='white', alpha=1)
 
         plt.tight_layout()
-        plt.savefig(f'./figures/dqn/{game_name}_stats.png', bbox_inches='tight')  # 保存为PNG格式，确保边界正确显示
+        if os.path.exists(f'./figures/'+exp_name+'/') is False:
+            os.makedirs(f'./figures/'+exp_name+'/')
+        plt.savefig(f'./figures/'+exp_name+f'/{game_name}_stats.png', bbox_inches='tight')  # 保存为PNG格式，确保边界正确显示
 
 
-def plot_data3x3(game_data):
+def plot_data3x3(game_data, exp_name):
     # 更新matplotlib配置以适应学术论文的要求
     plt.rcParams.update({
         'font.size': 10,
@@ -121,7 +125,7 @@ def plot_data3x3(game_data):
         ax.fill_between(range(len(reward_means)), reward_min, reward_max, color='lightgray', alpha=0.5)
         ax.set_title(f'{game_name}')
         ax.xaxis.set_major_formatter(FuncFormatter(lambda x, pos: f'{int(x * 0.1)}'))
-        ax.set_xlabel('Steps (in 1 millions)')
+        ax.set_xlabel('Millions of updates')
         ax.set_ylabel('Reward')
         ax.legend(frameon=False, loc='upper left')
         ax.spines['top'].set_visible(False)
@@ -132,7 +136,7 @@ def plot_data3x3(game_data):
         ax.grid(True, linestyle='--', linewidth=0.6, color='white', alpha=1)  # 添加透明的网格线
     plt.tight_layout()
     # plt.savefig('./figures/dqn/tpami_rewards.eps', format='eps', bbox_inches='tight')
-    plt.savefig('./figures/dqn_rewards.png', bbox_inches='tight')
+    plt.savefig('./figures/'+exp_name+' rewards.png', bbox_inches='tight')
 
     # 绘制Q值统计图
     fig, axs = plt.subplots(3, 3, figsize=(25, 15), dpi=300)
@@ -146,7 +150,7 @@ def plot_data3x3(game_data):
         ax.fill_between(range(len(q_means)), q_min, q_max, color='lightgray', alpha=0.5)
         ax.set_title(f'{game_name}')
         ax.xaxis.set_major_formatter(FuncFormatter(lambda x, pos: f'{int(x * 0.1)}'))
-        ax.set_xlabel('Updates (in 1 millions)')
+        ax.set_xlabel('Millions of updates')
         ax.set_ylabel('Q value')
         ax.legend(frameon=False, loc='upper left')
         ax.spines['top'].set_visible(False)
@@ -157,11 +161,11 @@ def plot_data3x3(game_data):
         ax.grid(True, linestyle='--', linewidth=0.6, color='white', alpha=1)  # 添加透明的网格线
     plt.tight_layout()
     # plt.savefig('./figures/dqn/tpami_q_values.eps', format='eps', bbox_inches='tight')
-    plt.savefig('./figures/dqn_q_values.png', bbox_inches='tight')
+    plt.savefig('./figures/'+exp_name+' q values.png', bbox_inches='tight')
 
 
 # 主执行函数
-def main(log_dir):
+def main(log_dir, exp_name):
     game_data = {}
     for folder in os.listdir(log_dir):
         if '.log' in folder:
@@ -174,8 +178,9 @@ def main(log_dir):
                 if game_name not in game_data:
                     game_data[game_name] = []
                 game_data[game_name].append((rewards[:200], q_values[:2000]))
-    plot_each_data(game_data)
+    plot_each_data(game_data, exp_name)
+    plot_data3x3(game_data, exp_name)
 
 
 # 示例调用
-main('./exps/dqn')
+main('./exps/dqn', exp_name='DQN 2015')
