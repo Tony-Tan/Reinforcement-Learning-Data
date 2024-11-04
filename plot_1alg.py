@@ -13,15 +13,25 @@ def extract_game_name(folder_name):
     return None
 
 
+from tensorboard.backend.event_processing.event_accumulator import EventAccumulator
+
 def load_tensorboard_data(log_dir):
+    # Load the TensorBoard data
     accumulator = EventAccumulator(log_dir)
     accumulator.Reload()
 
-    # 提取reward和q值的数据
+    # Check if the required scalars exist before extracting the data
+    if 'avg_reward' not in accumulator.Tags()['scalars']:
+        raise KeyError("Scalar 'avg_reward' not found in the log data.")
+    if 'q' not in accumulator.Tags()['scalars']:
+        raise KeyError("Scalar 'q' not found in the log data.")
+
+    # Extract reward and Q-value data
     rewards = [scalar.value for scalar in accumulator.Scalars('avg_reward')]
     q_values = [scalar.value for scalar in accumulator.Scalars('q')]
 
     return rewards, q_values
+
 
 
 def formatter(x, pos):
@@ -39,18 +49,15 @@ def plot_each_data(game_data, exp_name):
     for game_name, data in game_data.items():
         rewards, q_values = zip(*data)
 
-        min_length = min(len(q) for q in q_values)
-        q_values = [q[:min_length] for q in q_values]
-
         reward_means = np.mean(rewards, axis=0)
         reward_medians = np.median(rewards, axis=0)
         reward_max = np.max(rewards, axis=0)
         reward_min = np.min(rewards, axis=0)
 
-        q_means = np.mean(q_values, axis=0)[::10]
-        q_medians = np.median(q_values, axis=0)[::10]
-        q_max = np.max(q_values, axis=0)[::10]
-        q_min = np.min(q_values, axis=0)[::10]
+        q_means = np.mean(q_values, axis=0)
+        q_medians = np.median(q_values, axis=0)
+        q_max = np.max(q_values, axis=0)
+        q_min = np.min(q_values, axis=0)
 
         fig, axs = plt.subplots(2, 1, figsize=(10, 10), dpi=300)  # 使用更高的DPI确保图像质量
 
@@ -60,7 +67,7 @@ def plot_each_data(game_data, exp_name):
         ax1.plot(reward_medians, linestyle='dashed', label='Median Reward', color='darkorange')
         ax1.fill_between(range(len(reward_means)), reward_min, reward_max, color='lightgray', alpha=0.5)
         ax1.set_title(f'Reward for {game_name}')
-        ax1.xaxis.set_major_formatter(FuncFormatter(lambda x, pos: f'{int(x * 0.1)}'))
+        ax1.xaxis.set_major_formatter(FuncFormatter(lambda x, pos: f'{int(x * 1)}'))
         ax1.set_xlabel('Millions of updates')
         ax1.set_ylabel('Reward')
         ax1.legend(frameon=False)
@@ -106,15 +113,15 @@ def plot_data3x3(game_data, exp_name):
         reward_max = np.max(rewards, axis=0)
         reward_min = np.min(rewards, axis=0)
 
-        q_means = np.mean(q_values, axis=0)[:2000:10]
-        q_medians = np.median(q_values, axis=0)[:2000:10]
-        q_max = np.max(q_values, axis=0)[:2000:10]
-        q_min = np.min(q_values, axis=0)[:2000:10]
+        q_means = np.mean(q_values, axis=0)
+        q_medians = np.median(q_values, axis=0)
+        q_max = np.max(q_values, axis=0)
+        q_min = np.min(q_values, axis=0)
 
         return reward_means, reward_medians, reward_max, reward_min, q_means, q_medians, q_max, q_min
 
     # 绘制奖励统计图
-    fig, axs = plt.subplots(3, 3, figsize=(25, 15), dpi=300)
+    fig, axs = plt.subplots(4, 2, figsize=(12, 20), dpi=300)
     axs = axs.ravel()
     for idx, (game_name, data) in enumerate(game_data.items()):
         reward_means, reward_medians, reward_max, reward_min, _, _, _, _ = prepare_data(data)
@@ -124,7 +131,7 @@ def plot_data3x3(game_data, exp_name):
         ax.plot(reward_medians, linestyle='dashed', label='Median Reward', color='darkorange')
         ax.fill_between(range(len(reward_means)), reward_min, reward_max, color='lightgray', alpha=0.5)
         ax.set_title(f'{game_name}')
-        ax.xaxis.set_major_formatter(FuncFormatter(lambda x, pos: f'{int(x * 0.1)}'))
+        ax.xaxis.set_major_formatter(FuncFormatter(lambda x, pos: f'{int(x)}'))
         ax.set_xlabel('Millions of updates')
         ax.set_ylabel('Reward')
         ax.legend(frameon=False, loc='upper left')
@@ -139,7 +146,7 @@ def plot_data3x3(game_data, exp_name):
     plt.savefig('./figures/'+exp_name+' rewards.png', bbox_inches='tight')
 
     # 绘制Q值统计图
-    fig, axs = plt.subplots(3, 3, figsize=(25, 15), dpi=300)
+    fig, axs = plt.subplots(4, 2, figsize=(12, 20), dpi=300)
     axs = axs.ravel()
     for idx, (game_name, data) in enumerate(game_data.items()):
         _, _, _, _, q_means, q_medians, q_max, q_min = prepare_data(data)
@@ -149,7 +156,7 @@ def plot_data3x3(game_data, exp_name):
         ax.plot(q_medians, linestyle='dashed', label='Median Q', color='crimson')
         ax.fill_between(range(len(q_means)), q_min, q_max, color='lightgray', alpha=0.5)
         ax.set_title(f'{game_name}')
-        ax.xaxis.set_major_formatter(FuncFormatter(lambda x, pos: f'{int(x * 0.1)}'))
+        ax.xaxis.set_major_formatter(FuncFormatter(lambda x, pos: f'{int(x  )}'))
         ax.set_xlabel('Millions of updates')
         ax.set_ylabel('Q value')
         ax.legend(frameon=False, loc='upper left')
@@ -174,10 +181,9 @@ def main(log_dir, exp_name):
         if game_name:
             data_path = os.path.join(log_dir, folder)
             rewards, q_values = load_tensorboard_data(data_path)
-            if len(rewards) >= 200:
-                if game_name not in game_data:
-                    game_data[game_name] = []
-                game_data[game_name].append((rewards[:200], q_values[:2000]))
+            if game_name not in game_data:
+                game_data[game_name] = []
+            game_data[game_name].append((rewards, q_values))
     plot_each_data(game_data, exp_name)
     plot_data3x3(game_data, exp_name)
 

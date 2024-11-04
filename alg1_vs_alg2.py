@@ -59,16 +59,16 @@ def plot_each_data(game_data, alg_name0, bg_game_data, alg_name1):
         bg_reward_min = np.min(bg_rewards, axis=0)
 
         # data for q_values
-        q_means = np.mean(q_values, axis=0)[::10]
-        q_medians = np.median(q_values, axis=0)[::10]
-        q_max = np.max(q_values, axis=0)[::10]
-        q_min = np.min(q_values, axis=0)[::10]
+        q_means = np.mean(q_values, axis=0)
+        q_medians = np.median(q_values, axis=0)
+        q_max = np.max(q_values, axis=0)
+        q_min = np.min(q_values, axis=0)
 
         # data for duel_q_values
-        bg_q_means = np.mean(bg_q_values, axis=0)[::10]
-        bg_q_medians = np.median(bg_q_values, axis=0)[::10]
-        bg_q_max = np.max(bg_q_values, axis=0)[::10]
-        bg_q_min = np.min(bg_q_values, axis=0)[::10]
+        bg_q_means = np.mean(bg_q_values, axis=0)
+        bg_q_medians = np.median(bg_q_values, axis=0)
+        bg_q_max = np.max(bg_q_values, axis=0)
+        bg_q_min = np.min(bg_q_values, axis=0)
 
         fig, axs = plt.subplots(2, 1, figsize=(10, 10), dpi=300)  # 调整总图大小以适应详细信息
 
@@ -87,7 +87,7 @@ def plot_each_data(game_data, alg_name0, bg_game_data, alg_name1):
         ax1.fill_between(range(len(bg_reward_means)), bg_reward_min, bg_reward_max, color='salmon', alpha=0.2)
 
         ax1.set_title(f'Reward for {bg_game_name}')
-        ax1.xaxis.set_major_formatter(FuncFormatter(lambda x, pos: f'{int(x * 0.1)}'))
+        ax1.xaxis.set_major_formatter(FuncFormatter(lambda x, pos: f'{int(x)}'))
         ax1.set_xlabel('Millions of updates')
         ax1.set_ylabel('Reward')
         ax1.legend(frameon=False)
@@ -109,7 +109,7 @@ def plot_each_data(game_data, alg_name0, bg_game_data, alg_name1):
         ax2.fill_between(range(len(bg_q_means)), bg_q_min, bg_q_max, color='lightgreen', alpha=0.2)
 
         ax2.set_title(f'Q Values for {bg_game_name}')
-        ax2.xaxis.set_major_formatter(FuncFormatter(lambda x, pos: f'{int(x * 0.1)}'))
+        ax2.xaxis.set_major_formatter(FuncFormatter(lambda x, pos: f'{int(x )}'))
         ax2.set_xlabel('Millions of updates')
         ax2.set_ylabel('Q value')
         ax2.legend(frameon=False)
@@ -142,10 +142,10 @@ def plot_data3x3(game_data, alg_name0, bg_game_data, alg_name1):
         reward_max = np.max(rewards, axis=0)
         reward_min = np.min(rewards, axis=0)
 
-        q_means = np.mean(q_values, axis=0)[:2000:10]
-        q_medians = np.median(q_values, axis=0)[:2000:10]
-        q_max = np.max(q_values, axis=0)[:2000:10]
-        q_min = np.min(q_values, axis=0)[:2000:10]
+        q_means = np.mean(q_values, axis=0)[:2000:]
+        q_medians = np.median(q_values, axis=0)[:2000:]
+        q_max = np.max(q_values, axis=0)[:2000:]
+        q_min = np.min(q_values, axis=0)[:2000:]
 
         return reward_means, reward_medians, reward_max, reward_min, q_means, q_medians, q_max, q_min
 
@@ -165,7 +165,7 @@ def plot_data3x3(game_data, alg_name0, bg_game_data, alg_name1):
         ax.plot(reward_medians, linestyle='dashed', label=alg_name0 + ' Median Reward', color='blue')
         ax.fill_between(range(len(bg_reward_means)), bg_reward_min, bg_reward_max, color='lightgray', alpha=0.5)
         ax.set_title(f'{game_name}')
-        ax.xaxis.set_major_formatter(FuncFormatter(lambda x, pos: f'{int(x * 0.1)}'))
+        ax.xaxis.set_major_formatter(FuncFormatter(lambda x, pos: f'{int(x )}'))
         ax.set_xlabel('Millions of updates')
         ax.set_ylabel('Reward')
         ax.legend(frameon=False, loc='upper left')
@@ -198,7 +198,7 @@ def plot_data3x3(game_data, alg_name0, bg_game_data, alg_name1):
         ax.plot(q_medians, linestyle='dashed', label=alg_name0 + ' Median Q', color='cornflowerblue')
         ax.fill_between(range(len(bg_q_means)), bg_q_min, bg_q_max, color='lightgray', alpha=0.5)
         ax.set_title(f'{game_name}')
-        ax.xaxis.set_major_formatter(FuncFormatter(lambda x, pos: f'{int(x * 0.1)}'))
+        ax.xaxis.set_major_formatter(FuncFormatter(lambda x, pos: f'{int(x )}'))
         ax.set_xlabel('Millions of updates')
         ax.set_ylabel('Q value')
         ax.legend(frameon=False, loc='upper left')
