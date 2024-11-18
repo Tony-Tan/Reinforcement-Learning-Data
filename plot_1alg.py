@@ -93,7 +93,7 @@ def plot_each_data(game_data, exp_name):
         plt.savefig(f'./figures/'+exp_name+f'/{game_name}_stats.png', bbox_inches='tight')  # 保存为PNG格式，确保边界正确显示
 
 
-def plot_data3x3(game_data, exp_name):
+def plot_data3x2(game_data, exp_name):
     # 更新matplotlib配置以适应学术论文的要求
     plt.rcParams.update({
         'font.size': 10,
@@ -121,7 +121,7 @@ def plot_data3x3(game_data, exp_name):
         return reward_means, reward_medians, reward_max, reward_min, q_means, q_medians, q_max, q_min
 
     # 绘制奖励统计图
-    fig, axs = plt.subplots(4, 2, figsize=(12, 20), dpi=300)
+    fig, axs = plt.subplots(3, 2, figsize=(12, 20), dpi=300)
     axs = axs.ravel()
     for idx, (game_name, data) in enumerate(game_data.items()):
         reward_means, reward_medians, reward_max, reward_min, _, _, _, _ = prepare_data(data)
@@ -146,7 +146,7 @@ def plot_data3x3(game_data, exp_name):
     plt.savefig('./figures/'+exp_name+' rewards.png', bbox_inches='tight')
 
     # 绘制Q值统计图
-    fig, axs = plt.subplots(4, 2, figsize=(12, 20), dpi=300)
+    fig, axs = plt.subplots(3, 2, figsize=(12, 20), dpi=300)
     axs = axs.ravel()
     for idx, (game_name, data) in enumerate(game_data.items()):
         _, _, _, _, q_means, q_medians, q_max, q_min = prepare_data(data)
@@ -185,8 +185,8 @@ def main(log_dir, exp_name):
                 game_data[game_name] = []
             game_data[game_name].append((rewards, q_values))
     plot_each_data(game_data, exp_name)
-    plot_data3x3(game_data, exp_name)
+    plot_data3x2(game_data, exp_name)
 
 
 # 示例调用
-main('./exps/dqn', exp_name='DQN 2015')
+main('./exps/double_dqn', exp_name='Double DQN')

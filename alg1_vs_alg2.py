@@ -183,7 +183,7 @@ def plot_data3x3(game_data, alg_name0, bg_game_data, alg_name1):
     plt.savefig('./figures/' + alg_name0 + ' vs ' + alg_name1 + '_rewards.png', bbox_inches='tight')
 
     # 绘制Q值统计图
-    fig, axs = plt.subplots(3, 3, figsize=(25, 15), dpi=300)
+    fig, axs = plt.subplots(3, 3, figsize=(30, 15), dpi=300)
     axs = axs.ravel()
     idx = 0
     for (game_name, data) in bg_game_data.items():
